@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 
 def memory_stress_test():
-    logging.info("Starting Memory Stress Test...")
+    logging.info("Starting Memory Stress Test..")
     print("Starting Memory Stress Test...")
     try:
         stress_process = subprocess.Popen(

@@ -44,7 +44,7 @@ def disk_stress_test():
     print("Starting Disk Stress Test...")
     try:
         stress_process = subprocess.Popen(
-            ["stress-ng", "--iomix", "4", "--iomix-byes", "90%", "--timeout", "30"],
+            ["stress-ng", "--iomix", "4", "--iomix-bytes", "90%", "--timeout", "30"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )

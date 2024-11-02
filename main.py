@@ -3,6 +3,9 @@ import subprocess
 import time
 import logging
 import psutil
+from dotenv import load_dotenv
+from twilio.rest import Client
+import google.generativeai as genai
 
 # Logging configuration
 logging.basicConfig(
@@ -11,6 +14,34 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
+
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+genai.configure(api_key=API_KEY)
+
+def fetch_logs():
+    with open('stress_test.log', 'r') as file:
+        lines = file.readlines()[-40:]
+    return ''.join(lines)
+
+def send_logs_to_api(logs):
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(f"You are an SRE. You have to suggest troubleshooting steps based on the given logs in 200 words.\n{logs}")
+    print(response.text)
+    return response.text
+
+def send_whatsapp_message(message_body):
+    account_sid = os.environ["ACC_SID"]
+    auth_token = os.environ["AUTH_TOKEN"]
+    client = Client(account_sid, auth_token)
+    sent_message = client.messages.create(
+        body=message_body,
+        from_=os.environ["from_whatsapp_number"],
+        to=os.environ["to_whatsapp_number"]
+    )
+    print("WhatsApp message sent with SID:", sent_message.sid)
+    return sent_message.sid
 
 def memory_stress_test():
     logging.info("Starting Memory Stress Test...")
@@ -184,6 +215,12 @@ def main():
             break
         else:
             print("Invalid choice. Please try again.")
+
+        logs = fetch_logs()
+        analysis_result = send_logs_to_api(logs)
+        #print(analysis_result)
+        if analysis_result:
+            send_whatsapp_message(analysis_result)
 
 if __name__ == "__main__":
     main()

@@ -1,9 +1,14 @@
-FROM python:latest
+FROM python:3.9-slim
 
 RUN apt-get update && \
-    apt-get install -y stress-ng && \
+    apt-get install -y stress-ng iperf3 sysbench && \
     rm -rf /var/lib/apt/lists/*
+RUN pip install psutil
+
+COPY main.py /app/stress_test.py
 
 WORKDIR /app
-COPY main.py .
-CMD ["python", "main.py"]
+
+EXPOSE 5201
+
+CMD ["python", "/app/stress_test.py"]

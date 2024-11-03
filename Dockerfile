@@ -1,14 +1,17 @@
 FROM python:3.9-slim
 
-RUN apt-get update && \
-    apt-get install -y stress-ng iperf3 sysbench && \
-    rm -rf /var/lib/apt/lists/*
-RUN pip install psutil
-
-COPY main.py /app/stress_test.py
-
 WORKDIR /app
 
-EXPOSE 5201
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv stress-ng iperf3 sysbench && \
+    rm -rf /var/lib/apt/lists/*
 
-CMD ["python", "/app/stress_test.py"]
+RUN python3 -m venv /app/venv
+
+COPY . /app
+
+RUN /app/venv/bin/pip install --no-cache-dir psutil
+
+ENV PATH="/app/venv/bin:$PATH"
+
+ENTRYPOINT ["python", "main.py"]

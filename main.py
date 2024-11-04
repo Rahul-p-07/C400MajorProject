@@ -21,7 +21,7 @@ API_KEY = os.getenv("API_KEY")
 genai.configure(api_key=API_KEY)
 
 def fetch_logs():
-    with open('stress_test.log', 'r') as file:
+    with open('/root/stress_test.log', 'r') as file:
         lines = file.readlines()[-40:]
     return ''.join(lines)
 
